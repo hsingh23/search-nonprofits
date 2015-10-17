@@ -1,0 +1,26 @@
+{% if my_emails|length > 0 %}
+	<h2>Nonprofits with email</h2>
+	{% for item in my_emails %}
+		<p>
+			<a href="mailto:{{item.url}}?Subject=Seeking%20{{(item.person + " reguarding " + item.name)|urlencode}}">{{item.name}}</a> - {{item.url}} {{item.full_addr}} <b>{{item.person}} - <a href="http://www.melissadata.com/lookups/np.asp?mp=p&ein={{item.ein}}" target="_blank">{{item.year}}</a></b>
+		</p>
+	{% endfor %}
+{% endif %}
+
+{% if my_websites|length > 0 %}
+	<h2>Nonprofits with websites</h2>
+	{% for item in my_websites %}
+		<p>
+			<a href="{{item.url}}">{{item.name}} - {{item.url}}</a> {{item.full_addr}} <b>{{item.person}} - <a href="http://www.melissadata.com/lookups/np.asp?mp=p&ein={{item.ein}}" target="_blank">{{item.year}}</a></b>
+		</p>
+	{% endfor %}
+{% endif %}
+
+{% if my_none|length > 0 and include_none %}
+	<h2>Nonprofits with no easy contact</h2>
+	{% for item in my_none %}
+		<p>
+			{{item.name}} - {{item.url}}</a> {{item.full_addr}} <b>{{item.person}} - <a href="http://www.melissadata.com/lookups/np.asp?mp=p&ein={{item.ein}}" target="_blank">{{item.year}}</a></b>
+		</p>
+	{% endfor %}
+{% endif %}

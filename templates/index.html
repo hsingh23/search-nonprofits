@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<!-- Required meta tags always come first -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<title>Search Nonprofits</title>
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="https://cdn.rawgit.com/twbs/bootstrap/v4-dev/dist/css/bootstrap.css">
+</head>
+<body>
+	<style>
+		.form-inline {
+			text-align: center;
+		}
+	</style>
+	<nav class="navbar navbar-dark bg-primary">
+		<a class="navbar-brand">Search Nonprofits</a>
+	</nav>
+
+	<br><br>
+	<div class="container-fluid">
+		<form class="form-inline" onsubmit="populateResults(); return false;" id="form">
+			<div class="form-group">
+				<label class="sr-only" for="name">Nonprofit Name</label>
+				<input type="text" class="form-control" id="name" placeholder="Nonprofit Name" name="name">
+			</div>
+			<div class="form-group">
+				<label class="sr-only" for="city">City</label>
+				<input type="text" class="form-control" id="city" placeholder="City" name="city">
+			</div>
+			<div class="form-group">
+				<label class="sr-only" for="exampleInputPassword3">State</label>
+				<input type="text" class="form-control" id="exampleInputPassword3" placeholder="State" name="state">
+			</div>
+			<button type="submit" class="btn btn-success">Search!</button>
+		</form>
+	</div>
+	<br><br>
+	
+	<div class="container-fluid" id="results"></div>
+	<!-- jQuery first, then Bootstrap JS. -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<script src="https://cdn.rawgit.com/twbs/bootstrap/v4-dev/dist/js/bootstrap.js"></script>
+	<script>
+		var $form = $("#form");
+		var $results = $("#results");
+		var populateResults = function getResults () {
+			$.get("/api?"+$form.serialize(), function(data){
+				$results.html(data);
+			});
+		};			
+	</script>
+</body>
+</html>
