@@ -8,13 +8,17 @@
 	<title>Search Nonprofits</title>
 	<!-- Bootstrap CSS -->
 	<link rel="stylesheet" href="https://cdn.rawgit.com/twbs/bootstrap/v4-dev/dist/css/bootstrap.css">
-</head>
-<body>
 	<style>
 		.form-inline {
 			text-align: center;
 		}
 	</style>
+	<script>
+	/*! modernizr 3.1.0 (Custom Build) | MIT *
+ * http://modernizr.com/download/?-geolocation !*/
+!function(n,e,o){function s(n,e){return typeof n===e}function a(){var n,e,o,a,i,f,c;for(var r in l){if(n=[],e=l[r],e.name&&(n.push(e.name.toLowerCase()),e.options&&e.options.aliases&&e.options.aliases.length))for(o=0;o<e.options.aliases.length;o++)n.push(e.options.aliases[o].toLowerCase());for(a=s(e.fn,"function")?e.fn():e.fn,i=0;i<n.length;i++)f=n[i],c=f.split("."),1===c.length?Modernizr[c[0]]=a:(!Modernizr[c[0]]||Modernizr[c[0]]instanceof Boolean||(Modernizr[c[0]]=new Boolean(Modernizr[c[0]])),Modernizr[c[0]][c[1]]=a),t.push((a?"":"no-")+c.join("-"))}}function i(n){var e=c.className,o=Modernizr._config.classPrefix||"";if(r&&(e=e.baseVal),Modernizr._config.enableJSClass){var s=new RegExp("(^|\\s)"+o+"no-js(\\s|$)");e=e.replace(s,"$1"+o+"js$2")}Modernizr._config.enableClasses&&(e+=" "+o+n.join(" "+o),r?c.className.baseVal=e:c.className=e)}var t=[],l=[],f={_version:"3.1.0",_config:{classPrefix:"",enableClasses:!0,enableJSClass:!0,usePrefixes:!0},_q:[],on:function(n,e){var o=this;setTimeout(function(){e(o[n])},0)},addTest:function(n,e,o){l.push({name:n,fn:e,options:o})},addAsyncTest:function(n){l.push({name:null,fn:n})}},Modernizr=function(){};Modernizr.prototype=f,Modernizr=new Modernizr,Modernizr.addTest("geolocation","geolocation"in navigator);var c=e.documentElement,r="svg"===c.nodeName.toLowerCase();a(),i(t),delete f.addTest,delete f.addAsyncTest;for(var u=0;u<Modernizr._q.length;u++)Modernizr._q[u]();n.Modernizr=Modernizr}(window,document);</script>
+</head>
+<body>
 	<nav class="navbar navbar-dark bg-primary">
 		<a class="navbar-brand">Search Nonprofits</a>
 	</nav>
@@ -32,25 +36,63 @@
 			</div>
 			<div class="form-group">
 				<label class="sr-only" for="exampleInputPassword3">State</label>
-				<input type="text" class="form-control" id="exampleInputPassword3" placeholder="State" name="state">
+				<input type="text" class="form-control" id="state" placeholder="State" name="state">
 			</div>
 			<button type="submit" class="btn btn-success">Search!</button>
 		</form>
 	</div>
 	<br><br>
-	
+
 	<div class="container-fluid" id="results"></div>
 	<!-- jQuery first, then Bootstrap JS. -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 	<script src="https://cdn.rawgit.com/twbs/bootstrap/v4-dev/dist/js/bootstrap.js"></script>
 	<script>
 		var $form = $("#form");
+		var $city = $("#city");
+		var $state = $("#state");
 		var $results = $("#results");
 		var populateResults = function getResults () {
 			$.get("/api?"+$form.serialize(), function(data){
 				$results.html(data);
 			});
-		};			
+		};
+
+		if (Modernizr.geolocation) {
+
+      var successCallback = function(position){
+      	$.get('http://maps.googleapis.com/maps/api/geocode/json?latlng='+position.coords.latitude+','+position.coords.longitude+'&sensor=true', function (data) {
+      			var $x = $(data.results[0].address_components);
+	      		$city.val($x.filter(function(i,o){return o.types[0]=="locality"})[0].short_name);
+	      		$state.val($x.filter(function(i,o){return o.types[0]=="administrative_area_level_1"})[0].short_name);
+	      		populateResults();
+	      	});
+      };
+
+      var options = {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      };
+
+      var errorCallback = function(error){
+        var errorMessage = 'Unknown error';
+        switch(error.code) {
+          case 1:
+            errorMessage = 'Permission denied';
+            break;
+          case 2:
+            errorMessage = 'Position unavailable';
+            break;
+          case 3:
+            errorMessage = 'Timeout';
+            break;
+        }
+        document.write(errorMessage);
+      };
+
+      navigator.geolocation.getCurrentPosition(successCallback,errorCallback,options);
+		}			
 	</script>
 </body>
 </html>
