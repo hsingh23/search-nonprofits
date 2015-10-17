@@ -26,6 +26,8 @@ class Nonprofit(object):
 		t.state = nonprofit_details[8].upper().strip()
 		t.full_addr = "{0} {1}, {2}, {3}".format(t.addr1, t.addr2, t.city, t.state)
 		t.ein = "0"+t.ein  if (len(t.ein)==8) else t.ein
+		if t.url[:4] != "http":
+			t.url = "http://" + t.url
 
 	def match(t, name, city, state):
 		res =  t.name.lower().find(name.lower()) > -1 and \
