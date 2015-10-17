@@ -12,6 +12,10 @@
 		.form-inline {
 			text-align: center;
 		}
+		.center {
+			text-align: center;
+			margin:auto;
+		}
 	</style>
 	<script>
 	/*! modernizr 3.1.0 (Custom Build) | MIT *
@@ -44,6 +48,7 @@
 	<br><br>
 
 	<div class="container-fluid" id="results"></div>
+	<div class="container-fluid" id="loadingDiv" class="center"> <h3 class="center"> Fetching your results - please be patient.</h3> </div>
 	<!-- jQuery first, then Bootstrap JS. -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 	<script src="https://cdn.rawgit.com/twbs/bootstrap/v4-dev/dist/js/bootstrap.js"></script>
@@ -55,13 +60,22 @@
 		var populateResults = function getResults () {
 			$.get("/api?"+$form.serialize(), function(data){
 				$results.html(data);
-			});
+			}).fail(function(){populateResults();});
 		};
+
+		var $loading = $('#loadingDiv').hide();
+		$(document)
+	  .ajaxStart(function () {
+	    $loading.show();
+	  })
+	  .ajaxStop(function () {
+	    $loading.hide();
+	  });
 
 		if (Modernizr.geolocation) {
 
       var successCallback = function(position){
-      	$.get('http://maps.googleapis.com/maps/api/geocode/json?latlng='+position.coords.latitude+','+position.coords.longitude+'&sensor=true', function (data) {
+      	$.get('https://maps.googleapis.com/maps/api/geocode/json?latlng='+position.coords.latitude+','+position.coords.longitude+'&sensor=true', function (data) {
       			var $x = $(data.results[0].address_components);
 	      		$city.val($x.filter(function(i,o){return o.types[0]=="locality"})[0].short_name);
 	      		$state.val($x.filter(function(i,o){return o.types[0]=="administrative_area_level_1"})[0].short_name);
