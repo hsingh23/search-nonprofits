@@ -1,5 +1,5 @@
 Flask==0.10.1
-gevent==1.0.2
+gevent==1.2a1
 greenlet==0.4.9
 gunicorn==19.3.0
 itsdangerous==0.24
